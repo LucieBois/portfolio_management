@@ -3,6 +3,7 @@ import sqlite3
 from functools import lru_cache
 
 from sqlalchemy import Engine, create_engine, event
+from sqlalchemy.pool import ConnectionPoolEntry
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,9 @@ def get_engine(db_uri: str, echo: bool = False) -> Engine:
         connect_args={"check_same_thread": False},
     )
 
-    def sqlite_pragma(dbapi_connection: sqlite3.Connection) -> None:
+    def sqlite_pragma(
+        dbapi_connection: sqlite3.Connection, _connection_record: ConnectionPoolEntry
+    ) -> None:
         cursor = dbapi_connection.cursor()
 
         try:
