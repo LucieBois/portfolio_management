@@ -25,7 +25,7 @@ BASE_ASSETS: list[AssetModel] = [
     AssetModel(
         name="AMUNDI PHYSICAL GOLD ETC",
         isin="FR0013416716",
-        esg=False,
+        esg=True,
         defense=0.0,
         oil=0.0,
     ),
