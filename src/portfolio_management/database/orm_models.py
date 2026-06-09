@@ -4,7 +4,7 @@ from sqlalchemy import DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from portfolio_management.database import Base
+from portfolio_management.database.base import Base
 
 
 class TimestampMixin:
