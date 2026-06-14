@@ -26,7 +26,7 @@ class TimestampMixin:
     )
 
 
-class Assets(Base, TimestampMixin):
+class AssetsORM(Base, TimestampMixin):
     __tablename__: str = "assets"
 
     id: Mapped[int] = mapped_column(primary_key=True)
