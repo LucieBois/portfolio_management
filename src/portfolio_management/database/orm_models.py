@@ -50,3 +50,9 @@ class AssetsORM(Base, TimestampMixin):
         default=0.0,
         comment="Percentage of the asset's investment made in oil activities",
     )
+
+    distributive: Mapped[bool] = mapped_column(
+        nullable=False,
+        default=False,
+        comment="Whether the asset distributes dividends or not",
+    )

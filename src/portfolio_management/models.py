@@ -7,6 +7,7 @@ class AssetModel(BaseModel):
     esg: bool
     defense: float
     oil: float
+    distributive: bool
 
     @field_validator("defense", "oil", mode="before")
     def validate_percentage(cls, value: float) -> float:
