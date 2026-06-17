@@ -81,6 +81,7 @@ class TestSeedDbCommand:
             assert row.esg == asset.esg
             assert row.defense == pytest.approx(asset.defense)  # pyright: ignore[reportUnknownMemberType]
             assert row.oil == pytest.approx(asset.oil)  # pyright: ignore[reportUnknownMemberType]
+            assert row.distributive == asset.distributive
 
     def test_idempotent_second_run_skips_existing(
         self, runner: CliRunner, db: tuple[Engine, str]
@@ -112,6 +113,7 @@ class TestSeedDbCommand:
                     esg=pre_existing.esg,
                     defense=pre_existing.defense,
                     oil=pre_existing.oil,
+                    distributive=pre_existing.distributive,
                 )
             )
             session.commit()
@@ -153,6 +155,7 @@ def test_seed_upserts_existing_asset(tmp_path: Path):
                 esg=not stale.esg,
                 defense=0.99,
                 oil=0.99,
+                distributive=not stale.distributive,
             )
         )
         session.commit()
@@ -170,3 +173,4 @@ def test_seed_upserts_existing_asset(tmp_path: Path):
     assert row.esg == stale.esg
     assert row.defense == stale.defense
     assert row.oil == stale.oil
+    assert row.distributive == stale.distributive

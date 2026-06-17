@@ -7,6 +7,7 @@ BASE_ASSETS: list[AssetModel] = [
         esg=True,
         defense=0.0,
         oil=0.0,
+        distributive=False,
     ),
     AssetModel(
         name="Amundi Index MSCI Emerging Markets SRI",
@@ -14,6 +15,7 @@ BASE_ASSETS: list[AssetModel] = [
         esg=True,
         defense=0.0,
         oil=0.0,
+        distributive=False,
     ),
     AssetModel(
         name="Amundi Core EURO STOXX 50 UCITS ETF EUR Acc",
@@ -21,6 +23,7 @@ BASE_ASSETS: list[AssetModel] = [
         esg=False,
         defense=0.0,
         oil=0.0492,
+        distributive=False,
     ),
     AssetModel(
         name="AMUNDI PHYSICAL GOLD ETC",
@@ -28,6 +31,7 @@ BASE_ASSETS: list[AssetModel] = [
         esg=True,
         defense=0.0,
         oil=0.0,
+        distributive=False,
     ),
     AssetModel(
         name="Amundi CAC 40 UCITS ETF Acc",
@@ -35,6 +39,7 @@ BASE_ASSETS: list[AssetModel] = [
         esg=False,
         defense=0.05,
         oil=0.1,
+        distributive=False,
     ),
     AssetModel(
         name="iShares Core DAX UCITS ETF EUR (Acc)",
@@ -42,6 +47,7 @@ BASE_ASSETS: list[AssetModel] = [
         esg=False,
         defense=0.0,
         oil=0.0,
+        distributive=False,
     ),
     AssetModel(
         name="iShares Core FTSE 100 UCITS ETF (dist)",
@@ -49,6 +55,7 @@ BASE_ASSETS: list[AssetModel] = [
         esg=False,
         defense=0.015,
         oil=0.13,
+        distributive=True,
     ),
     AssetModel(
         name="Amundi IBEX 35 UCITS ETF - Acc",
@@ -56,5 +63,6 @@ BASE_ASSETS: list[AssetModel] = [
         esg=False,
         defense=0.0,
         oil=0.08,
+        distributive=False,
     ),
 ]

@@ -28,6 +28,7 @@ def seed(session: Session) -> int:
                 esg=asset.esg,
                 defense=asset.defense,
                 oil=asset.oil,
+                distributive=asset.distributive,
             )
             .on_conflict_do_update(
                 index_elements=[AssetsORM.isin],
@@ -36,6 +37,7 @@ def seed(session: Session) -> int:
                     esg=asset.esg,
                     defense=asset.defense,
                     oil=asset.oil,
+                    distributive=asset.distributive,
                 ),
             )
         )
