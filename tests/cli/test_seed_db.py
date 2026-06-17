@@ -5,7 +5,7 @@ from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 from typer.testing import CliRunner
 
-from portfolio_management.cli.seed_db import app
+from portfolio_management.cli.seed_db import app, seed
 from portfolio_management.core import BASE_ASSETS
 from portfolio_management.database import AssetsORM, Base, get_engine
 
@@ -92,20 +92,17 @@ class TestSeedDbCommand:
         result = runner.invoke(app, ["--db-uri", uri])  # second run
 
         assert result.exit_code == 0
-        assert "already fully seeded" in result.output
 
         with Session(engine) as session:
             count = len(session.scalars(select(AssetsORM)).all())
-
         assert count == len(BASE_ASSETS)
 
     def test_partial_seed_only_inserts_missing_assets(
         self, runner: CliRunner, db: tuple[Engine, str]
     ):
-        """If one asset already exists, only the remaining ones are inserted."""
+        """If one asset already exists, all assets are still correctly seeded."""
         engine, uri = db
 
-        # Pre-seed only the first asset directly
         pre_existing = BASE_ASSETS[0]
         with Session(engine) as session:
             session.add(
@@ -122,8 +119,9 @@ class TestSeedDbCommand:
         result = runner.invoke(app, ["--db-uri", uri])
 
         assert result.exit_code == 0
-        expected_count = len(BASE_ASSETS) - 1
-        assert f"Successfully seeded {expected_count} new base assets" in result.output
+        assert (
+            f"Successfully seeded {len(BASE_ASSETS)} new base assets" in result.output
+        )
 
         with Session(engine) as session:
             count = len(session.scalars(select(AssetsORM)).all())
@@ -139,3 +137,36 @@ class TestSeedDbCommand:
         """Invoking without --db-uri should exit with a non-zero code."""
         result = runner.invoke(app, [])
         assert result.exit_code != 0
+
+
+def test_seed_upserts_existing_asset(tmp_path: Path):
+    """An asset already in the DB is updated when BASE_ASSETS changes."""
+    engine, _ = make_db(tmp_path)
+
+    # Pre-seed with a stale version of the first asset
+    stale = BASE_ASSETS[0]
+    with Session(engine) as session:
+        session.add(
+            AssetsORM(
+                name="Stale Name",
+                isin=stale.isin,
+                esg=not stale.esg,
+                defense=0.99,
+                oil=0.99,
+            )
+        )
+        session.commit()
+
+    # Run seed — should upsert and correct the stale values
+    with Session(engine) as session:
+        _ = seed(session)
+
+    with Session(engine) as session:
+        row = session.scalars(
+            select(AssetsORM).where(AssetsORM.isin == stale.isin)
+        ).one()
+
+    assert row.name == stale.name
+    assert row.esg == stale.esg
+    assert row.defense == stale.defense
+    assert row.oil == stale.oil
