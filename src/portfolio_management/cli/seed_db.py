@@ -2,7 +2,8 @@ import logging
 from typing import Annotated
 
 import typer
-from sqlalchemy import select
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+from sqlalchemy.engine import CursorResult
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -19,21 +20,29 @@ def seed(session: Session) -> int:
     seeded_count = 0
 
     for asset in BASE_ASSETS:
-        stmt = select(AssetsORM).where(AssetsORM.isin == asset.isin)
-        if session.scalars(stmt).first():
-            logger.info(f"Asset with ISIN {asset.isin} already exists. Skipping...")
-            continue
-
-        session.add(
-            AssetsORM(
+        stmt = (
+            sqlite_insert(AssetsORM)
+            .values(
                 name=asset.name,
                 isin=asset.isin,
                 esg=asset.esg,
                 defense=asset.defense,
                 oil=asset.oil,
             )
+            .on_conflict_do_update(
+                index_elements=[AssetsORM.isin],
+                set_=dict(
+                    name=asset.name,
+                    esg=asset.esg,
+                    defense=asset.defense,
+                    oil=asset.oil,
+                ),
+            )
         )
-        seeded_count += 1
+        result = session.execute(stmt)
+        assert isinstance(result, CursorResult)
+        if result.rowcount == 1:
+            seeded_count += 1
 
     session.commit()
     return seeded_count
