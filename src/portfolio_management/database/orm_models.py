@@ -56,3 +56,37 @@ class AssetsORM(Base, TimestampMixin):
         default=False,
         comment="Whether the asset distributes dividends or not",
     )
+
+
+class ExchangesORM(Base, TimestampMixin):
+    __tablename__: str = "exchanges"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    name: Mapped[str] = mapped_column(
+        unique=True, nullable=False, comment="Name of the exchange"
+    )
+
+    code: Mapped[str] = mapped_column(
+        unique=True, nullable=False, comment="Code of the exchange"
+    )
+
+    operating_mic: Mapped[str] = mapped_column(
+        unique=True, nullable=False, comment="Operating MIC of the exchange"
+    )
+
+    country: Mapped[str] = mapped_column(
+        nullable=False, comment="Country of the exchange"
+    )
+
+    currency: Mapped[str] = mapped_column(
+        nullable=False, comment="Currency of the exchange"
+    )
+
+    country_iso2: Mapped[str] = mapped_column(
+        nullable=False, comment="ISO2 code of the country of the exchange"
+    )
+
+    country_iso3: Mapped[str] = mapped_column(
+        nullable=False, comment="ISO3 code of the country of the exchange"
+    )
