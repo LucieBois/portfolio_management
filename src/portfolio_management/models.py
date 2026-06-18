@@ -1,4 +1,8 @@
-from pydantic import BaseModel, field_validator
+from typing import Annotated
+
+from pydantic import BaseModel, StringConstraints, field_validator
+
+type CleanStr = Annotated[str, StringConstraints(strip_whitespace=True, to_lower=True)]
 
 
 class AssetModel(BaseModel):
