@@ -21,10 +21,10 @@ class AssetModel(BaseModel):
 
 
 class ExchangeModel(BaseModel):
-    name: str
-    code: str
-    operating_mic: str
-    country: str
-    currency: str
-    country_iso2: str
-    country_iso3: str
+    name: CleanStr
+    code: CleanStr
+    operating_mic: CleanStr
+    country: CleanStr
+    currency: CleanStr
+    country_iso2: CleanStr
+    country_iso3: CleanStr
