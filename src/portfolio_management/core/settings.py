@@ -30,3 +30,11 @@ class DatabaseSettings(BaseSettings):
     def DB_URI(self) -> str:
         """Return SQLite URI"""
         return f"sqlite:///{self.DB_ABSOLUTE_PATH}"
+
+
+class ClientsSettings(BaseSettings):
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+        env_file=str(PATH_REPO_ROOT / ".env"), env_file_encoding="utf-8", extra="ignore"
+    )
+
+    EODHD_API_KEY: str = Field(default=..., alias="EODHD_API_KEY", exclude=True)
