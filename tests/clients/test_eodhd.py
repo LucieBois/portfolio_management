@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from portfolio_management.clients.eodh import EODHDClient
+from portfolio_management.clients.eodhd import EODHDClient
 from portfolio_management.models import ExchangeModel
 
 ##
