@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from sqlalchemy import Engine, select
@@ -35,9 +36,14 @@ def runner():
 
 @pytest.fixture()
 def db(tmp_path: Path):
-    """Yields (engine, uri) for a fresh, empty database per test."""
+    """Yields (engine, uri) for a fresh, empty database per test.
+
+    Patches DatabaseSettings so the CLI resolves its URI to this test database.
+    """
     engine, uri = make_db(tmp_path)
-    yield engine, uri
+    with patch("portfolio_management.cli.seed_db.DatabaseSettings") as mock_settings:
+        mock_settings.return_value.DB_URI = uri  # pyright: ignore[reportAny]
+        yield engine, uri
 
 
 ##
@@ -50,9 +56,9 @@ class TestSeedDbCommand:
         self, runner: CliRunner, db: tuple[Engine, str]
     ):
         """Running seed_db on an empty database inserts all BASE_ASSETS."""
-        engine, uri = db
+        engine, _ = db
 
-        result = runner.invoke(app, ["--db-uri", uri])
+        result = runner.invoke(app, [])
 
         assert result.exit_code == 0
         assert (
@@ -68,8 +74,8 @@ class TestSeedDbCommand:
         self, runner: CliRunner, db: tuple[Engine, str]
     ):
         """Every BASE_ASSETS entry is correctly persisted (isin, name, esg, defense, oil)."""
-        engine, uri = db
-        _ = runner.invoke(app, ["--db-uri", uri])
+        engine, _ = db
+        _ = runner.invoke(app, [])
 
         with Session(engine) as session:
             rows = {r.isin: r for r in session.scalars(select(AssetsORM)).all()}
@@ -87,10 +93,10 @@ class TestSeedDbCommand:
         self, runner: CliRunner, db: tuple[Engine, str]
     ):
         """Running seed_db twice does not duplicate rows and exits cleanly."""
-        engine, uri = db
+        engine, _ = db
 
-        _ = runner.invoke(app, ["--db-uri", uri])  # first run
-        result = runner.invoke(app, ["--db-uri", uri])  # second run
+        _ = runner.invoke(app, [])  # first run
+        result = runner.invoke(app, [])  # second run
 
         assert result.exit_code == 0
 
@@ -102,7 +108,7 @@ class TestSeedDbCommand:
         self, runner: CliRunner, db: tuple[Engine, str]
     ):
         """If one asset already exists, all assets are still correctly seeded."""
-        engine, uri = db
+        engine, _ = db
 
         pre_existing = BASE_ASSETS[0]
         with Session(engine) as session:
@@ -118,7 +124,7 @@ class TestSeedDbCommand:
             )
             session.commit()
 
-        result = runner.invoke(app, ["--db-uri", uri])
+        result = runner.invoke(app, [])
 
         assert result.exit_code == 0
         assert (
@@ -130,15 +136,22 @@ class TestSeedDbCommand:
         assert count == len(BASE_ASSETS)
 
     def test_output_mentions_db_uri(self, runner: CliRunner, db: tuple[Engine, str]):
-        """The CLI echoes the DB URI it is connecting to."""
+        """The CLI echoes the DB URI it resolved from settings."""
         _, uri = db
-        result = runner.invoke(app, ["--db-uri", uri])
+        result = runner.invoke(app, [])
         assert uri in result.output
 
-    def test_missing_db_uri_option_fails(self, runner: CliRunner):
-        """Invoking without --db-uri should exit with a non-zero code."""
-        result = runner.invoke(app, [])
-        assert result.exit_code != 0
+    def test_uri_is_resolved_from_settings(
+        self, runner: CliRunner, db: tuple[Engine, str]
+    ):
+        """The CLI takes no URI argument and reads it from DatabaseSettings."""
+        _, uri = db
+        with patch("portfolio_management.cli.seed_db.DatabaseSettings") as mock_settings:
+            mock_settings.return_value.DB_URI = uri  # pyright: ignore[reportAny]
+            result = runner.invoke(app, [])
+
+        assert result.exit_code == 0
+        mock_settings.assert_called_once()
 
 
 def test_seed_upserts_existing_asset(tmp_path: Path):
