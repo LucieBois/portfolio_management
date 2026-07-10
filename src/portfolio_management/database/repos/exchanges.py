@@ -7,8 +7,8 @@ from portfolio_management.models import ExchangeModel
 
 
 class ExchangesRepository:
-    def __init__(self, db_uri: str):
-        self.engine: Engine = get_engine(db_uri)
+    def __init__(self, engine: Engine):
+        self.engine: Engine = engine
 
     def get_all_exchanges(self) -> list[ExchangeModel]:
         with self.engine.connect() as connection:
