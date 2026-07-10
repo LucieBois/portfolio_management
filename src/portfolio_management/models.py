@@ -1,6 +1,6 @@
-from typing import Annotated
+from typing import Annotated, ClassVar
 
-from pydantic import BaseModel, StringConstraints, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
 
 type CleanStr = Annotated[str, StringConstraints(strip_whitespace=True, to_lower=True)]
 
@@ -21,10 +21,12 @@ class AssetModel(BaseModel):
 
 
 class ExchangeModel(BaseModel):
-    name: CleanStr
-    code: CleanStr
-    operating_mic: CleanStr
-    country: CleanStr
-    currency: CleanStr
-    country_iso2: CleanStr
-    country_iso3: CleanStr
+    model_config: ClassVar[ConfigDict] = ConfigDict(populate_by_name=True)
+
+    name: CleanStr = Field(alias="Name")
+    code: CleanStr = Field(alias="Code")
+    operating_mic: CleanStr = Field(alias="OperatingMIC")
+    country: CleanStr = Field(alias="Country")
+    currency: CleanStr = Field(alias="Currency")
+    country_iso2: CleanStr = Field(alias="CountryISO2")
+    country_iso3: CleanStr = Field(alias="CountryISO3")

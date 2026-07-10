@@ -15,15 +15,15 @@ def make_exchange_dict(
     code: str = "NYSE",
     name: str = "New York Stock Exchange",
 ) -> dict[str, object]:
-    """Raw API dict as EODHD would return it, with un-normalised casing."""
+    """Raw API dict as EODHD would return it, with PascalCase keys."""
     return {
-        "name": name,
-        "code": code,
-        "operating_mic": f"MIC-{code}",
-        "country": "United States",
-        "currency": "USD",
-        "country_iso2": "US",
-        "country_iso3": "USA",
+        "Name": name,
+        "Code": code,
+        "OperatingMIC": f"MIC-{code}",
+        "Country": "United States",
+        "Currency": "USD",
+        "CountryISO2": "US",
+        "CountryISO3": "USA",
     }
 
 
@@ -90,7 +90,7 @@ class _StubGet:
 @pytest.fixture()
 def client() -> Generator[EODHDClient, None, None]:
     """An EODHDClient with a stubbed API key and no real HTTP calls."""
-    with patch("portfolio_management.clients.eodh.ClientsSettings") as mock_settings:
+    with patch("portfolio_management.clients.eodhd.ClientsSettings") as mock_settings:
         mock_settings.return_value.EODHD_API_KEY = "test-api-key"  # pyright: ignore[reportAny]
         yield EODHDClient()
 
