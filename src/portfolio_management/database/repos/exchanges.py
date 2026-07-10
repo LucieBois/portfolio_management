@@ -2,7 +2,7 @@ from sqlalchemy import Engine, select
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
-from portfolio_management.database import ExchangesORM, get_engine
+from portfolio_management.database import ExchangesORM
 from portfolio_management.models import ExchangeModel
 
 
