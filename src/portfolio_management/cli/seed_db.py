@@ -1,5 +1,4 @@
 import logging
-from typing import Annotated
 
 import typer
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
@@ -8,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from portfolio_management.core import BASE_ASSETS
+from portfolio_management.core.settings import DatabaseSettings
 from portfolio_management.database import AssetsORM, Base, get_engine
 
 logger = logging.getLogger(__name__)
@@ -51,8 +51,11 @@ def seed(session: Session) -> int:
 
 
 @app.command()
-def seed_db(db_uri: Annotated[str, typer.Option(help="Database URI to connect to")]):
+def seed_db():
     """Seed the database with base assets."""
+
+    db_uri = DatabaseSettings().DB_URI
+
     typer.echo(f"Connecting to database at {db_uri}...")
     engine = get_engine(db_uri)
 
