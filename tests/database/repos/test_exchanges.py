@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from sqlalchemy import Engine
 
 from portfolio_management.database import Base, get_engine
 from portfolio_management.database.repos.exchanges import ExchangesRepository
@@ -16,13 +17,13 @@ def make_exchange(
 ) -> ExchangeModel:
     """Build an ExchangeModel with sensible defaults, overridable per field."""
     return ExchangeModel(
-        name=name,
-        code=code,
-        operating_mic=f"MIC-{code}",
-        country="united states",
-        currency="usd",
-        country_iso2="us",
-        country_iso3="usa",
+        Name=name,
+        Code=code,
+        OperatingMIC=f"MIC-{code}",
+        Country="united states",
+        Currency="usd",
+        CountryISO2="us",
+        CountryISO3="usa",
     )
 
 
@@ -35,8 +36,9 @@ def make_exchange(
 def repo(tmp_path: Path) -> ExchangesRepository:
     """A repository backed by a fresh, empty SQLite database per test."""
     uri = f"sqlite:///{tmp_path / 'test_exchanges.db'}"
-    Base.metadata.create_all(get_engine(uri))
-    return ExchangesRepository(uri)
+    engine: Engine = get_engine(uri)
+    Base.metadata.create_all(engine)
+    return ExchangesRepository(engine=engine)
 
 
 ##

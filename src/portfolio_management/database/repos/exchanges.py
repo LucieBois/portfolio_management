@@ -2,13 +2,13 @@ from sqlalchemy import Engine, select
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
-from portfolio_management.database import ExchangesORM, get_engine
+from portfolio_management.database import ExchangesORM
 from portfolio_management.models import ExchangeModel
 
 
 class ExchangesRepository:
-    def __init__(self, db_uri: str):
-        self.engine: Engine = get_engine(db_uri)
+    def __init__(self, engine: Engine):
+        self.engine: Engine = engine
 
     def get_all_exchanges(self) -> list[ExchangeModel]:
         with self.engine.connect() as connection:
