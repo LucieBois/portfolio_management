@@ -14,6 +14,7 @@ dependencies = [
 ]
 [project.scripts]
 seed-db = "portfolio_management.cli.seed_db:app"
+get-exchanges = "portfolio_management.cli.get_exchanges:app"
 
 [build-system]
 requires = ["hatchling"]
